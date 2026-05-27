@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <title>Mapa Geológico</title>
+
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    html,
+    body,
+    #map {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+//////////////////////////////////////////////////////
+// CREAR MAPA
+//////////////////////////////////////////////////////
+
+const map = L.map('map').setView([22.5, -102], 6);
+
+//////////////////////////////////////////////////////
+// MAPA BASE
+//////////////////////////////////////////////////////
+
+L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution: '© OpenStreetMap'
+  }
+).addTo(map);
+
+//////////////////////////////////////////////////////
+// CONTROL DE CAPAS
+//////////////////////////////////////////////////////
+
+const controlCapas = L.control.layers(
+  null,
+  null,
+  {
+    collapsed: false
+  }
+).addTo(map);
+
+//////////////////////////////////////////////////////
+// FUNCIÓN PARA CARGAR GEOJSON
+//////////////////////////////////////////////////////
+
+function cargarGeoJSON(url, opciones, nombreCapa) {
+
+  fetch(url)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+      const capa = L.geoJSON(
+        data,
+        opciones
+      ).addTo(map);
+
+      controlCapas.addOverlay(
+        capa,
+        nombreCapa
+      );
+
+    })
+
+    .catch(error =>
+      console.error(
+        'Error cargando capa:',
+        nombreCapa,
+        error
+      )
+    );
+}
+
+//////////////////////////////////////////////////////
+// CAPA 1
+//////////////////////////////////////////////////////
+
+cargarGeoJSON(
+
+'data/R-front-mich.geojson',
+
+{
+  style: {
+    color: '#ff0000',
+    weight: 2,
+    fillOpacity: 0.2
+  },
+
+  onEachFeature: function(feature, layer) {
+
+    layer.bindPopup(
+      '<b>R-front-mich</b><br>' +
+      JSON.stringify(feature.properties)
+    );
+
+  }
+},
+
+'R-front-mich'
+
+);
+
+//////////////////////////////////////////////////////
+// CAPA 2
+//////////////////////////////////////////////////////
+
+cargarGeoJSON(
+
+'data/REP-BUF-JALISCO.json',
+
+{
+  style: {
+    color: '#0066ff',
+    weight: 2,
+    fillOpacity: 0.2
+  }
+},
+
+'REP-BUF-JALISCO'
+
+);
+
+//////////////////////////////////////////////////////
+// CAPA 3
+//////////////////////////////////////////////////////
+
+cargarGeoJSON(
+
+'data/Geo-Otros-Mun.json',
+
+{
+  style: {
+    color: '#00aa55',
+    weight: 1,
+    fillOpacity: 0.15
+  }
+},
+
+'Geo-Otros-Mun'
+
+);
+
+//////////////////////////////////////////////////////
+// CAPA 4
+//////////////////////////////////////////////////////
+
+cargarGeoJSON(
+
+'data/GR-GUERRERO.json',
+
+{
+  style: {
+    color: '#ff9900',
+    weight: 2,
+    fillOpacity: 0.2
+  }
+},
+
+'GR-GUERRERO'
+
+);
+
+//////////////////////////////////////////////////////
+// CAPA 5
+//////////////////////////////////////////////////////
+
+cargarGeoJSON(
+
+'data/ESTADOS-ADR.geojson',
+
+{
+  style: {
+    color: '#555555',
+    weight: 1,
+    fillOpacity: 0.05
+  }
+},
+
+'ESTADOS-ADR'
+
+);
+
+</script>
+
+</body>
+</html>
